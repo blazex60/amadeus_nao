@@ -1,0 +1,14 @@
+[project]
+name = "open-campus"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.125.0",
+    "ollama>=0.6.1",
+    "pydantic>=2.12.5",
+    "python-socketio>=5.15.1",
+    "requests>=2.32.5",
+    "uvicorn>=0.38.0",
+]

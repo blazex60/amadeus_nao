@@ -1,0 +1,82 @@
+/* ベースのスタイル */
+body {
+  margin: 0;
+  background-color: #050505; /* 漆黒に近いグレー */
+  display: flex;
+  justify_content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+  font-family: 'Courier New', monospace;
+}
+
+/* ニキシー管フォント定義 */
+@font-face {
+  font-family: 'DSEG14';
+  src: url('/fonts/DSEG14Classic-Bold.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/npm/dseg@0.46.0/fonts/DSEG14-Classic/DSEG14Classic-Bold.woff2') format('woff2');
+  font-weight: bold;
+  font-style: normal;
+}
+
+/* メーター全体のコンテナ */
+.meter-container {
+  display: flex;
+  gap: 15px; /* 管と管の間隔 */
+  padding: 40px;
+  background: #111;
+  border-radius: 20px;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.8) inset;
+  border: 1px solid #333;
+}
+
+/* 個別のニキシー管（背景のガラス管部分） */
+.nixie-tube {
+  position: relative;
+  width: 100px;
+  height: 180px;
+  background: rgba(20, 10, 5, 0.6);
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 
+    0 0 10px rgba(0,0,0,0.5) inset, 
+    0 0 5px rgba(255, 255, 255, 0.1); /* ガラスの反射感 */
+}
+
+/* 数字のスタイル */
+.digit {
+  font-family: 'assets/NixieOne.ttf', 'Courier New', monospace;
+  font-size: 120px;
+  line-height: 1;
+  user-select: none;
+  transition: all 0.05s;
+}
+
+/* 輝き（ONの状態） */
+.digit.active {
+  color: #ff5500; /* オレンジ色の光 */
+  text-shadow: 
+    0 0 10px #ff4500,
+    0 0 20px #ff3300,
+    0 0 40px #ff0000,
+    0 0 80px #ff0000; /* 強烈なグロー効果 */
+  opacity: 1;
+  z-index: 2;
+}
+
+/* 消灯している数字（うっすら見えるフィラメント） */
+.digit.dim {
+  position: absolute;
+  color: #3a1a1a;
+  opacity: 0.1;
+  z-index: 1;
+}
+
+/* ドット（.）の調整 */
+.dot {
+  width: 40px; 
+  align-items: flex-end;
+  padding-bottom: 20px;
+}

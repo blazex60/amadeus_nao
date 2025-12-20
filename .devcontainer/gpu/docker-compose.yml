@@ -1,0 +1,48 @@
+version: '3.8'
+services:
+  app:
+    build:
+      context: ../..
+      dockerfile: back/dockerfile
+    volumes:
+      # プロジェクトのルート全体を /workspaces/プロジェクト名 にマウント
+      - ../..:/workspaces/${localWorkspaceFolderBasename}:cached
+    networks:
+      - amadeus-net
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  frontend:
+    build:
+      context: ../..
+      dockerfile: front/dockerfile
+    volumes:
+      - ../../frontend:/app:cached
+    ports:
+      - "5173:5173"
+    networks:
+      - amadeus-net
+    # フロントエンドコンテナも立ち上げっぱなしにする
+    tty: true
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - amadeus-net
+
+networks:
+  amadeus-net:
+
+volumes:
+  ollama_data:

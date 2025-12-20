@@ -1,0 +1,28 @@
+{
+  "name": "Amadeus-Fullstack-Dev",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}", // プロジェクトのルートを開く
+  "features": {
+    // バックエンドコンテナ内でNode.jsも使えるようにする
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20"
+    },
+    // コンテナ内からDockerコマンドを使いたい場合（任意）
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "charliermarsh.ruff", // uvを使っているならruffがおすすめ
+        "dsznajder.es7-react-js-snippets",
+        "dbaeumer.vscode-eslint"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/app/.venv/bin/python"
+      }
+    }
+  },
+  "remoteUser": "root"
+}
