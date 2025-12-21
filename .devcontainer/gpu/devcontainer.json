@@ -4,6 +4,9 @@
   "service": "app",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}", // プロジェクトのルートを開く
   "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "moby": false
+    },
     // バックエンドコンテナ内でNode.jsも使えるようにする
     "ghcr.io/devcontainers/features/node:1": {
       "version": "20"
