@@ -1,82 +1,143 @@
-/* ベースのスタイル */
-body {
-  margin: 0;
-  background-color: #050505; /* 漆黒に近いグレー */
+/* src/App.css */
+
+/* デジタル風の等幅フォントを導入 */
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+/* --- 全体の設定 --- */
+.App {
+  /* デジタルフォントを適用 */
+  font-family: 'Share Tech Mono', monospace;
+  background-color: #000; /* 完全な黒背景 */
+  min-height: 100vh;
+  color: #fff;
+  
+  /* Flexboxで中央揃えレイアウト */
   display: flex;
-  justify_content: center;
+  flex-direction: column;
   align-items: center;
-  height: 100vh;
-  overflow: hidden;
-  font-family: 'Courier New', monospace;
+  justify-content: space-between; /* 上中下に要素を配置 */
+  padding: 3rem 2rem; /* 全体の余白 */
+  box-sizing: border-box;
+  overflow: hidden; /* スクロールバーを隠す */
 }
 
-/* ニキシー管フォント定義 */
-@font-face {
-  font-family: 'DSEG14';
-  src: url('/fonts/DSEG14Classic-Bold.woff2') format('woff2'),
-       url('https://cdn.jsdelivr.net/npm/dseg@0.46.0/fonts/DSEG14-Classic/DSEG14Classic-Bold.woff2') format('woff2');
-  font-weight: bold;
-  font-style: normal;
+/* --- タイトル --- */
+h1 {
+  margin: 0;
+  font-size: 3.5rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  /* 白い光彩を追加 */
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.7), 0 0 20px rgba(255, 255, 255, 0.5);
 }
 
-/* メーター全体のコンテナ */
+/* --- ネットワークステータス --- */
+.net-status {
+  font-size: 1.2rem;
+  margin-top: 0.5rem;
+  margin-bottom: 3rem;
+  letter-spacing: 0.1em;
+}
+
+/* --- ダイバージェンスメーター（コンテナ） --- */
 .meter-container {
   display: flex;
-  gap: 15px; /* 管と管の間隔 */
-  padding: 40px;
-  background: #111;
-  border-radius: 20px;
-  box-shadow: 0 0 50px rgba(0, 0, 0, 0.8) inset;
-  border: 1px solid #333;
-}
-
-/* 個別のニキシー管（背景のガラス管部分） */
-.nixie-tube {
-  position: relative;
-  width: 100px;
-  height: 180px;
-  background: rgba(20, 10, 5, 0.6);
+  gap: 10px; /* 数字間の隙間 */
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: rgba(20, 0, 0, 0.6); /* 薄暗い背景 */
+  border: 2px solid #333;
   border-radius: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 
-    0 0 10px rgba(0,0,0,0.5) inset, 
-    0 0 5px rgba(255, 255, 255, 0.1); /* ガラスの反射感 */
+  box-shadow: inset 0 0 20px #000; /* 内側の影で奥行きを出す */
 }
 
-/* 数字のスタイル */
-.digit {
-  font-family: 'assets/NixieOne.ttf', 'Courier New', monospace;
-  font-size: 120px;
-  line-height: 1;
-  user-select: none;
-  transition: all 0.05s;
-}
-
-/* 輝き（ONの状態） */
-.digit.active {
-  color: #ff5500; /* オレンジ色の光 */
+/* ニキシー管風の数字スタイル */
+.nixie-digit {
+  font-size: 4rem;
+  color: #ff4500; /* オレンジレッド */
+  /* 強烈な発光エフェクト */
   text-shadow: 
-    0 0 10px #ff4500,
-    0 0 20px #ff3300,
-    0 0 40px #ff0000,
-    0 0 80px #ff0000; /* 強烈なグロー効果 */
-  opacity: 1;
-  z-index: 2;
+    0 0 5px #ff4500,
+    0 0 10px #ff8c00,
+    0 0 20px #ff4500,
+    0 0 40px #ff0000;
+  
+  /* ガラス管のような背景 */
+  background: rgba(40, 20, 20, 0.8);
+  padding: 0.2em 0.4em;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 69, 0, 0.3);
+  position: relative;
 }
 
-/* 消灯している数字（うっすら見えるフィラメント） */
-.digit.dim {
+/* 小数点 */
+.nixie-dot {
+  font-size: 4rem;
+  color: #ff4500;
+  text-shadow: 0 0 10px #ff4500;
+  align-self: flex-end; /* 下揃え */
+  margin-bottom: 0.5em;
+}
+
+
+/* --- AIセリフエリア --- */
+.amadeus-text-box {
+  width: 90%;
+  max-width: 800px; /* 幅の上限を設定 */
+  margin: 2rem 0;
+  padding: 2rem;
+  
+  /* サイバーパンク風のデザイン */
+  border: 2px solid #f0f; /* マゼンタ色の枠線 */
+  background: rgba(30, 0, 30, 0.7); /* 半透明の背景 */
+  box-shadow: 
+    0 0 15px rgba(255, 0, 255, 0.4), /* 外側の光彩 */
+    inset 0 0 20px rgba(255, 0, 255, 0.2); /* 内側の光彩 */
+  
+  text-align: left; /* テキストは左揃え */
+  position: relative;
+}
+
+/* 左側の太いアクセントバー */
+.amadeus-text-box::before {
+  content: '';
   position: absolute;
-  color: #3a1a1a;
-  opacity: 0.1;
-  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 100%;
+  background: #f0f;
+  box-shadow: 0 0 10px #f0f;
 }
 
-/* ドット（.）の調整 */
-.dot {
-  width: 40px; 
-  align-items: flex-end;
-  padding-bottom: 20px;
+.amadeus-text {
+  font-size: 1.8rem;
+  color: #f0f; /* マゼンタ色の文字 */
+  /* 文字の発光エフェクト */
+  text-shadow: 0 0 8px #f0f, 0 0 15px rgba(255, 0, 255, 0.7);
+  line-height: 1.5;
+}
+
+.ai-label {
+  font-weight: bold;
+  margin-right: 0.5em;
+  color: #fff; /* "AI:" の部分は白くして強調 */
+  text-shadow: 0 0 5px #fff;
+}
+
+
+/* --- システムログ --- */
+.system-log {
+  width: 100%;
+  text-align: left;
+  font-size: 1rem;
+  color: #fa0; /* オレンジ色の文字 */
+  border-top: 1px solid #333; /* 上部に区切り線 */
+  padding-top: 1rem;
+  opacity: 0.8; /* 少し薄くして古びた感じに */
+}
+
+.log-prompt {
+  color: #fa0;
+  margin-right: 0.5em;
 }

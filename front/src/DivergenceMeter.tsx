@@ -1,104 +1,94 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { io } from 'socket.io-client';
-import './App.css';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+// 親のApp.tsxでApp.cssが読み込まれていればスタイルは適用されますが、
+// 念のためここでもインポートしておくと確実です。
+import './App.css'; 
 
-// バックエンドのURL（Docker Compose環境）
-const SOCKET_URL = "http://localhost:8000";
+// 1つのニキシー管を表示するサブコンポーネント
+// ここで "nixie-digit" クラスを使うのがポイントです
+const NixieTube = ({ value }: { value: string }) => {
+  return (
+    <div className="nixie-digit">
+      {value}
+    </div>
+  );
+};
 
-const DivergenceMeter = () => {
-  const [phase, setPhase] = useState('IDLE');
-  const [displayChars, setDisplayChars] = useState(Array(8).fill('0'));
-  const [lockedIndices, setLockedIndices] = useState([]);
-  const targetValueRef = useRef("0.000000");
-  const socketRef = useRef(null);
+// 小数点を表示するサブコンポーネント
+const NixieDot = () => {
+  return (
+    <div className="nixie-dot">.</div>
+  );
+}
 
-  // --- Socket.io 接続設定 ---
-  useEffect(() => {
-    socketRef.current = io(SOCKET_URL);
+interface DivergenceMeterProps {
+  targetValue?: string;
+}
 
-    // バックエンドからのフェーズ変更命令を受信
-    socketRef.current.on("change_phase", (newPhase) => {
-      setPhase(newPhase);
-    });
+const DivergenceMeter = ({ targetValue }: DivergenceMeterProps) => {
+  // 初期値
+  const [displayValue, setDisplayValue] = useState("1.048596");
+  
+  const intervalRef = useRef<number | null>(null);
 
-    // バックエンドからの数値確定命令を受信
-    socketRef.current.on("start_settling", (data) => {
-      targetValueRef.current = data.target;
-      setPhase('SETTLING');
-    });
-
-    return () => socketRef.current.disconnect();
+  // 数値整形関数
+  const formatValue = useCallback((val: string): string => {
+    const num = parseFloat(val);
+    if (isNaN(num)) return "0.000000";
+    return num.toFixed(6);
   }, []);
 
-  // --- ボタンクリック時の挙動 ---
-  const handleScanClick = () => {
-    // バックエンドにスキャン開始をリクエスト
-    socketRef.current.emit("request_scan");
-  };
+  // ランダム生成関数
+  const generateRandomWorldLine = useCallback((): string => {
+    const whole = Math.floor(Math.random() * 4); // 0-3
+    const decimal = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+    return `${whole}.${decimal}`;
+  }, []);
 
-  // --- アニメーション制御（前回のロジックを流用） ---
+  // アニメーションロジック
   useEffect(() => {
-    let shuffleTimer;
-    let lockTimer;
+    if (!targetValue) return;
 
-    if (phase === 'IDLE' || phase === 'RESULT') {
-        // 結果表示
-        setDisplayChars(targetValueRef.current.split(''));
-    } else if (phase === 'SHUFFLE') {
-        shuffleTimer = setInterval(() => {
-            setDisplayChars(prev => prev.map((c, i) => i === 1 ? '.' : Math.floor(Math.random() * 10).toString()));
-        }, 30);
-    } else if (phase === 'SETTLING') {
-        // 1. シャッフル継続
-        shuffleTimer = setInterval(() => {
-            setDisplayChars(prev => prev.map((char, idx) => {
-                if (lockedIndices.includes(idx)) return targetValueRef.current[idx];
-                return Math.floor(Math.random() * 10).toString();
-            }));
-        }, 30);
-
-        // 2. 0.4秒ごとに一桁ロック（自動で進む）
-        if (lockedIndices.length < 8) {
-            lockTimer = setTimeout(() => {
-                const unlocked = [0, 2, 3, 4, 5, 6, 7].filter(i => !lockedIndices.includes(i));
-                if (unlocked.length > 0) {
-                    const randomIdx = unlocked[Math.floor(Math.random() * unlocked.length)];
-                    setLockedIndices([...lockedIndices, randomIdx]);
-                } else {
-                    setPhase('RESULT');
-                }
-            }, 400);
-        } else {
-            setPhase('RESULT');
-        }
+    if (intervalRef.current !== null) {
+      window.clearInterval(intervalRef.current);
     }
 
+    const duration = 2000; // 2秒間演出
+    const startTime = Date.now();
+
+    intervalRef.current = window.setInterval(() => {
+      const elapsed = Date.now() - startTime;
+
+      if (elapsed > duration) {
+        setDisplayValue(formatValue(targetValue));
+        if (intervalRef.current !== null) {
+          window.clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
+      } else {
+        setDisplayValue(generateRandomWorldLine());
+      }
+    }, 50);
+
     return () => {
-        clearInterval(shuffleTimer);
-        clearTimeout(lockTimer);
+      if (intervalRef.current !== null) {
+        window.clearInterval(intervalRef.current);
+      }
     };
-  }, [phase, lockedIndices]);
+  }, [targetValue, formatValue, generateRandomWorldLine]);
+
+  // 文字列を分解して表示
+  const chars = displayValue.split('');
 
   return (
-    <div className="bg-black min-h-screen flex flex-col items-center justify-center">
-      <div className="meter-container">
-        {displayChars.map((char, index) => (
-          <div key={index} className={`nixie-tube ${char === '.' ? 'dot' : ''}`}>
-            <span className={`digit ${phase !== 'IDLE' ? 'active' : ''}`}>{char}</span>
-            {char !== '.' && <span className="digit dim">8</span>}
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-10">
-        <button 
-          onClick={handleScanClick}
-          className="px-6 py-2 bg-red-900 text-white font-mono border border-red-500 hover:bg-red-700 transition"
-          disabled={phase === 'SHUFFLE' || phase === 'SETTLING'}
-        >
-          CONNECT TO AMADEUS
-        </button>
-      </div>
+    // ここで "meter-container" クラスを指定します
+    <div className="meter-container">
+      {chars.map((char, index) => {
+        if (char === '.') {
+          return <NixieDot key={`dot-${index}`} />;
+        } else {
+          return <NixieTube key={`digit-${index}`} value={char} />;
+        }
+      })}
     </div>
   );
 };

@@ -1,11 +1,16 @@
 import paramiko
 import time
 import sys
+import os
+from dotenv import load_dotenv
+
+# 環境変数を読み込み
+load_dotenv()
 
 # --- 設定 ---
-NAO_IP = "10.96.8.112"   # ★あなたのNAOのIP
-NAO_USER = "nao"
-NAO_PASS = "nao"
+NAO_IP = os.getenv("NAO_IP", "192.168.10.31")
+NAO_USER = os.getenv("NAO_USER", "nao")
+NAO_PASS = os.getenv("NAO_PASSWORD", "nao")
 LOCAL_FILE = "nao_eye.py"
 REMOTE_FILE = "/home/nao/nao_eye.py"
 
